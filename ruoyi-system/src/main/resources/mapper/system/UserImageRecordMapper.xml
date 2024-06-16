@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.UserImageRecordMapper">
+
+    <insert id="insert">
+        INSERT INTO user_image_records (id, user_id, username, type, url, ai_prob, datetime)
+        VALUES (#{id},
+                #{userId},
+                #{username},
+                #{type},
+                #{url},
+                #{aiProb},
+                #{datetime, jdbcType=TIMESTAMP})
+    </insert>
+    <delete id="deleteImageByIds" parameterType="Long">
+        update user_image_records set del_flag = '2' where id in
+        <foreach collection="array" item="fileIds" open="(" separator="," close=")">
+            #{fileIds}
+        </foreach>
+    </delete>
+    <select id="getRecordByInfo" resultType="com.ruoyi.system.domain.UserImageRecord">
+        SELECT * FROM user_image_records
+        WHERE user_id = #{userId}
+          and del_flag = 1
+        <if test="type != null and type != ''">
+            AND type = #{type}
+        </if>
+        <if test="startTime != null and startTime != ''">
+            and date_format(datetime,'%y%m%d') &gt;= date_format(#{startTime},'%y%m%d')
+        </if>
+        <if test="endTime != null and endTime != ''">
+            and date_format(datetime,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+        </if>
+    </select>
+</mapper>
